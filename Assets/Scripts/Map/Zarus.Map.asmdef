@@ -3,7 +3,6 @@
     "rootNamespace": "Zarus.Map",
     "references": [
         "LibTessDotNet",
-        "Unity.Netcode.Runtime",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

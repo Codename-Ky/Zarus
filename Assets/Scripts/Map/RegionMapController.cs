@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Zarus.Map
 {
@@ -80,11 +83,15 @@ namespace Zarus.Map
         private readonly List<RegionEntry> runtimeEntries = new();
         private readonly List<RegionRuntime> activeRegions = new();
         private readonly Dictionary<int, RegionRuntime> colliderLookup = new();
+        private readonly List<Mesh> runtimeGeneratedMeshes = new();
         private Bounds localBounds;
         private RegionRuntime currentHover;
         private RegionRuntime currentSelection;
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+#if UNITY_EDITOR
+        private bool pendingRebuild;
+#endif
 
         public IReadOnlyList<RegionEntry> Entries => runtimeEntries;
         public RegionEntryEvent OnRegionHovered => onRegionHovered;
@@ -111,13 +118,7 @@ namespace Zarus.Map
 
         private void OnDestroy()
         {
-            foreach (var runtime in activeRegions)
-            {
-                if (runtime.OwnsMesh && runtime.Entry.Mesh != null)
-                {
-                    Destroy(runtime.Entry.Mesh);
-                }
-            }
+            CleanupRuntimeMeshes();
         }
 
         private void Update()
@@ -128,13 +129,24 @@ namespace Zarus.Map
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (!isActiveAndEnabled)
+            if (!isActiveAndEnabled || pendingRebuild)
             {
                 return;
             }
 
-            ResolveEntries();
-            BuildRuntimeRegions();
+            pendingRebuild = true;
+            // Defer GameObject operations to avoid "SendMessage cannot be called during OnValidate" errors
+            EditorApplication.delayCall += HandleDeferredRebuild;
+        }
+
+        private void HandleDeferredRebuild()
+        {
+            pendingRebuild = false;
+            if (this != null && isActiveAndEnabled)
+            {
+                ResolveEntries();
+                BuildRuntimeRegions();
+            }
         }
 #endif
 
@@ -188,15 +200,17 @@ namespace Zarus.Map
             else if (fallbackGeoJson != null)
             {
                 var geometries = RegionGeometryFactory.ParseGeoJson(fallbackGeoJson.text, out var normalization);
-                var centeredMeshes = RegionGeometryFactory.CreateCenteredMeshes(geometries, normalization);
+                var (centeredMeshes, centroids) = RegionGeometryFactory.CreateCenteredMeshes(geometries, normalization);
                 
                 for (int i = 0; i < geometries.Count; i++)
                 {
                     var geometry = geometries[i];
                     var mesh = centeredMeshes[i];
+                    var centroid = centroids[i];
                     mesh.hideFlags = HideFlags.DontSave;
+                    runtimeGeneratedMeshes.Add(mesh);
                     var entry = new RegionEntry();
-                    entry.SetRuntimeData(geometry.Id, geometry.Name, mesh, mesh.bounds.center, mesh.bounds);
+                    entry.SetRuntimeData(geometry.Id, geometry.Name, mesh, centroid, mesh.bounds);
                     runtimeEntries.Add(entry);
                 }
 
@@ -233,8 +247,22 @@ namespace Zarus.Map
             return bounds;
         }
 
+        private void CleanupRuntimeMeshes()
+        {
+            // Clean up runtime-generated meshes when using fallback GeoJSON
+            foreach (var mesh in runtimeGeneratedMeshes)
+            {
+                if (mesh != null)
+                {
+                    Destroy(mesh);
+                }
+            }
+            runtimeGeneratedMeshes.Clear();
+        }
+
         private void BuildRuntimeRegions()
         {
+            CleanupRuntimeMeshes();
             EnsureContainer();
             foreach (Transform child in regionContainer)
             {
@@ -293,11 +321,7 @@ namespace Zarus.Map
                 var collider = regionObject.AddComponent<MeshCollider>();
                 collider.sharedMesh = entry.Mesh;
 
-                var ownsMesh = entry.Mesh != null && (entry.Mesh.hideFlags & HideFlags.DontSave) != 0;
-                var runtime = new RegionRuntime(entry, renderer, collider)
-                {
-                    OwnsMesh = ownsMesh
-                };
+                var runtime = new RegionRuntime(entry, renderer, collider);
                 runtime.UpdateColor(entry.VisualStyle.BaseColor);
                 activeRegions.Add(runtime);
                 colliderLookup[collider.GetInstanceID()] = runtime;
@@ -465,7 +489,6 @@ namespace Zarus.Map
             public RegionEntry Entry { get; }
             public MeshRenderer Renderer { get; }
             public MeshCollider Collider { get; }
-            public bool OwnsMesh { get; set; }
             private readonly MaterialPropertyBlock propertyBlock = new();
 
             public RegionRuntime(RegionEntry entry, MeshRenderer renderer, MeshCollider collider)

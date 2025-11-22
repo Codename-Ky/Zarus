@@ -16,7 +16,7 @@ MonoBehaviour:
   - regionId: ZANC
     displayName: Northern Cape
     mesh: {fileID: 4300000, guid: cface4214fde8b42c91827032c5e069c, type: 2}
-    centroid: {x: -0.2507278, y: 0.22953263, z: 0}
+    centroid: {x: -0.23443693, y: 0.20517686, z: 0}
     bounds:
       m_Center: {x: -0.2507278, y: 0.22953263, z: 0}
       m_Extent: {x: 0.18221137, y: 0.16474617, z: 0}
@@ -24,8 +24,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -33,7 +31,7 @@ MonoBehaviour:
   - regionId: ZAKZN
     displayName: KwaZulu-Natal
     mesh: {fileID: 4300000, guid: 6d8c96b629c9fefc4a1fbf588a700982, type: 2}
-    centroid: {x: 0.14703143, y: 0.22557047, z: 0}
+    centroid: {x: 0.1408395, y: 0.23446637, z: 0}
     bounds:
       m_Center: {x: 0.14703143, y: 0.22557047, z: 0}
       m_Extent: {x: 0.08120324, y: 0.085944645, z: 0}
@@ -41,8 +39,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -50,7 +46,7 @@ MonoBehaviour:
   - regionId: ZAFS
     displayName: Free State
     mesh: {fileID: 4300000, guid: 7bf1d5d0f2e965dadb2b6738817f64d2, type: 2}
-    centroid: {x: -0.0066829324, y: 0.23642193, z: 0}
+    centroid: {x: -0.014386852, y: 0.23915248, z: 0}
     bounds:
       m_Center: {x: -0.0066829324, y: 0.23642193, z: 0}
       m_Extent: {x: 0.10938588, y: 0.080799714, z: 0}
@@ -58,8 +54,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -67,7 +61,7 @@ MonoBehaviour:
   - regionId: ZAEC
     displayName: Eastern Cape
     mesh: {fileID: 4300000, guid: c0d72ec889cdc574eba01ecd5073e5f9, type: 2}
-    centroid: {x: -0.030499551, y: 0.09879413, z: 0}
+    centroid: {x: -0.031525664, y: 0.09648711, z: 0}
     bounds:
       m_Center: {x: -0.030499551, y: 0.09879413, z: 0}
       m_Extent: {x: 0.15015212, y: 0.08508842, z: 0}
@@ -75,8 +69,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -84,7 +76,7 @@ MonoBehaviour:
   - regionId: ZALP
     displayName: Limpopo
     mesh: {fileID: 4300000, guid: 98d7e819e707acc84a022dc8c78a48d5, type: 2}
-    centroid: {x: 0.07674764, y: 0.43388337, z: 0}
+    centroid: {x: 0.08285874, y: 0.4331862, z: 0}
     bounds:
       m_Center: {x: 0.07674764, y: 0.43388337, z: 0}
       m_Extent: {x: 0.10975531, y: 0.06611663, z: 0}
@@ -92,8 +84,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -101,7 +91,7 @@ MonoBehaviour:
   - regionId: ZANW
     displayName: North West
     mesh: {fileID: 4300000, guid: 1625440973572dd9da603ac6d8405fb1, type: 2}
-    centroid: {x: -0.070957825, y: 0.32952327, z: 0}
+    centroid: {x: -0.06881303, y: 0.3333008, z: 0}
     bounds:
       m_Center: {x: -0.070957825, y: 0.32952327, z: 0}
       m_Extent: {x: 0.114027336, y: 0.06999402, z: 0}
@@ -109,8 +99,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -118,7 +106,7 @@ MonoBehaviour:
   - regionId: ZAMP
     displayName: Mpumalanga
     mesh: {fileID: 4300000, guid: 04046fb6f700e87fb88cc1fa5a669a25, type: 2}
-    centroid: {x: 0.11682701, y: 0.354647, z: 0}
+    centroid: {x: 0.12325976, y: 0.34917796, z: 0}
     bounds:
       m_Center: {x: 0.11682701, y: 0.354647, z: 0}
       m_Extent: {x: 0.075282425, y: 0.07141751, z: 0}
@@ -126,8 +114,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -135,7 +121,7 @@ MonoBehaviour:
   - regionId: ZAWC
     displayName: Western Cape
     mesh: {fileID: 4300000, guid: 3905edbfab7b5f9758efafc3bd5604b8, type: 2}
-    centroid: {x: 0.02611044, y: -0.16796562, z: 0}
+    centroid: {x: -0.2662448, y: 0.06186218, z: 0}
     bounds:
       m_Center: {x: 0.02611044, y: -0.16796562, z: 0}
       m_Extent: {x: 0.40682873, y: 0.33203438, z: 0}
@@ -143,8 +129,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}
@@ -152,7 +136,7 @@ MonoBehaviour:
   - regionId: ZAGP
     displayName: Gauteng
     mesh: {fileID: 4300000, guid: d73a8cc00807487f7a89c04194e2d43a, type: 2}
-    centroid: {x: 0.036202557, y: 0.3436744, z: 0}
+    centroid: {x: 0.036388267, y: 0.33981496, z: 0}
     bounds:
       m_Center: {x: 0.036202557, y: 0.3436744, z: 0}
       m_Extent: {x: 0.038882673, y: 0.03601432, z: 0}
@@ -160,8 +144,6 @@ MonoBehaviour:
       baseColor: {r: 0.11, g: 0.59, b: 0.68, a: 1}
       hoverColor: {r: 1, g: 1, b: 1, a: 1}
       selectedColor: {r: 1, g: 0.76, b: 0.25, a: 1}
-      disabledColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      lockSaturation: 0
     description: 
     externalUrl: 
     icon: {fileID: 0}

@@ -77,6 +77,11 @@ namespace Zarus.Map
                     continue;
                 }
 
+                if (lookup.ContainsKey(entry.RegionId))
+                {
+                    Debug.LogWarning($"[RegionDatabase] Duplicate region ID detected: '{entry.RegionId}'. Only the last entry will be accessible via lookup.", this);
+                }
+
                 lookup[entry.RegionId] = entry;
             }
         }
@@ -208,16 +213,9 @@ namespace Zarus.Map
         [SerializeField]
         private Color selectedColor = new Color(1f, 0.76f, 0.25f, 1f);
 
-        [SerializeField]
-        private Color disabledColor = new Color(0.2f, 0.2f, 0.2f, 1f);
-
-        [SerializeField]
-        private bool lockSaturation;
-
-        public Color BaseColor => lockSaturation ? Color.Lerp(baseColor, Color.white, 0.15f) : baseColor;
+        public Color BaseColor => baseColor;
         public Color HoverColor => hoverColor;
         public Color SelectedColor => selectedColor;
-        public Color DisabledColor => disabledColor;
 
         public void CopyFrom(RegionVisualStyle other)
         {
@@ -229,8 +227,6 @@ namespace Zarus.Map
             baseColor = other.baseColor;
             hoverColor = other.hoverColor;
             selectedColor = other.selectedColor;
-            disabledColor = other.disabledColor;
-            lockSaturation = other.lockSaturation;
         }
     }
 }

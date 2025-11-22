@@ -105,8 +105,8 @@ namespace Zarus.Map.Editor
         {
             var results = new List<RegionEntry>(geometries.Count);
             
-            // Use two-pass centered mesh creation for proper visual centering
-            var centeredMeshes = RegionGeometryFactory.CreateCenteredMeshes(geometries, normalization);
+            // Use two-pass centered mesh creation with proper geographic centroids
+            var (centeredMeshes, centroids) = RegionGeometryFactory.CreateCenteredMeshes(geometries, normalization);
             
             AssetDatabase.StartAssetEditing();
             try
@@ -115,6 +115,7 @@ namespace Zarus.Map.Editor
                 {
                     var geometry = geometries[i];
                     var mesh = centeredMeshes[i];
+                    var centroid = centroids[i];
                     var entry = new RegionEntry();
                     var meshPath = Path.Combine(DefaultMeshFolder, $"{geometry.Id}_Mesh.asset").Replace('\\', '/');
                     
@@ -122,8 +123,8 @@ namespace Zarus.Map.Editor
                     mesh.name = $"{geometry.Id}_Mesh";
                     AssetDatabase.CreateAsset(mesh, meshPath);
 
-                    // Use the centered mesh's bounds.center as centroid (already offset correctly)
-                    entry.SetRuntimeData(geometry.Id, geometry.Name, mesh, mesh.bounds.center, mesh.bounds);
+                    // Use the true geographic centroid (properly offset) instead of mesh bounds center
+                    entry.SetRuntimeData(geometry.Id, geometry.Name, mesh, centroid, mesh.bounds);
                     if (!string.IsNullOrEmpty(geometry.Id) && artistData != null && artistData.TryGetValue(geometry.Id, out var artistEntry))
                     {
                         entry.CopyArtistFacingData(artistEntry);

@@ -9,6 +9,9 @@ namespace Zarus.Map
 {
     public static class RegionGeometryFactory
     {
+        private const float MinNormalizationRange = 0.0001f;
+        private const float MinPolygonArea = 0.0001f;
+
         public struct Normalization
         {
             public Vector2 Center;
@@ -74,7 +77,7 @@ namespace Zarus.Map
             var rangeX = (float)(maxX - minX);
             var rangeY = (float)(maxY - minY);
             var largestRange = Mathf.Max(rangeX, rangeY);
-            if (largestRange <= 0.0001f)
+            if (largestRange <= MinNormalizationRange)
             {
                 largestRange = 1f;
             }
@@ -118,20 +121,27 @@ namespace Zarus.Map
         /// Creates centered meshes using a two-pass approach:
         /// 1. Creates all meshes to calculate combined bounds
         /// 2. Recreates all meshes offset by the visual center
+        /// Returns both the centered meshes and their true geographic centroids
         /// </summary>
-        public static List<UnityEngine.Mesh> CreateCenteredMeshes(IReadOnlyList<RegionGeometry> geometries, Normalization normalization)
+        public static (List<UnityEngine.Mesh> meshes, List<Vector3> centroids) CreateCenteredMeshes(IReadOnlyList<RegionGeometry> geometries, Normalization normalization)
         {
             if (geometries == null || geometries.Count == 0)
             {
-                return new List<UnityEngine.Mesh>();
+                return (new List<UnityEngine.Mesh>(), new List<Vector3>());
             }
 
-            // First pass: create meshes without offset to calculate bounds
+            // First pass: create meshes without offset to calculate bounds and true centroids
             var tempMeshes = new List<UnityEngine.Mesh>();
+            var originalCentroids = new List<Vector3>();
+            
             foreach (var geometry in geometries)
             {
                 var mesh = CreateMesh(geometry, normalization, Vector3.zero, geometry.Id);
                 tempMeshes.Add(mesh);
+                
+                // Calculate true geographic centroid from the original geometry
+                var centroid = CalculateGeometricCentroid(geometry, normalization);
+                originalCentroids.Add(centroid);
             }
 
             // Calculate combined bounds
@@ -146,14 +156,89 @@ namespace Zarus.Map
 
             // Second pass: recreate meshes with visual center offset
             var centeredMeshes = new List<UnityEngine.Mesh>();
+            var centeredCentroids = new List<Vector3>();
+            
             for (int i = 0; i < geometries.Count; i++)
             {
                 var geometry = geometries[i];
                 var mesh = CreateMesh(geometry, normalization, visualCenter, geometry.Id, tempMeshes[i]);
                 centeredMeshes.Add(mesh);
+                
+                // Apply the same visual center offset to the centroids
+                centeredCentroids.Add(originalCentroids[i] - visualCenter);
             }
 
-            return centeredMeshes;
+            return (centeredMeshes, centeredCentroids);
+        }
+
+        /// <summary>
+        /// Calculates the geometric centroid of a region based on its polygon shapes.
+        /// Uses area-weighted centroid calculation for accurate positioning.
+        /// </summary>
+        private static Vector3 CalculateGeometricCentroid(RegionGeometry geometry, Normalization normalization)
+        {
+            if (geometry == null || geometry.Shapes.Count == 0)
+            {
+                return Vector3.zero;
+            }
+
+            double totalArea = 0;
+            double centroidX = 0;
+            double centroidY = 0;
+
+            foreach (var shape in geometry.Shapes)
+            {
+                if (shape.Outer == null || shape.Outer.Count < 3)
+                {
+                    continue;
+                }
+
+                // Normalize the polygon points
+                var normalizedPoints = new List<Vector2>();
+                foreach (var point in shape.Outer)
+                {
+                    var normalized = (point - normalization.Center) / normalization.Range;
+                    normalizedPoints.Add(normalized);
+                }
+
+                // Calculate polygon area and centroid using the shoelace formula
+                double area = 0;
+                double cx = 0;
+                double cy = 0;
+
+                for (int i = 0; i < normalizedPoints.Count; i++)
+                {
+                    var current = normalizedPoints[i];
+                    var next = normalizedPoints[(i + 1) % normalizedPoints.Count];
+                    
+                    double crossProduct = current.x * next.y - next.x * current.y;
+                    area += crossProduct;
+                    cx += (current.x + next.x) * crossProduct;
+                    cy += (current.y + next.y) * crossProduct;
+                }
+
+                area *= 0.5;
+                
+                if (Math.Abs(area) > MinPolygonArea)
+                {
+                    cx /= (6.0 * area);
+                    cy /= (6.0 * area);
+                    
+                    // Weight by absolute area (in case of holes)
+                    double absArea = Math.Abs(area);
+                    totalArea += absArea;
+                    centroidX += cx * absArea;
+                    centroidY += cy * absArea;
+                }
+            }
+
+            if (totalArea > MinPolygonArea)
+            {
+                centroidX /= totalArea;
+                centroidY /= totalArea;
+            }
+
+            return new Vector3((float)centroidX, (float)centroidY, 0f);
         }
 
         private static RegionPolygon ParsePolygon(JToken polygonElement, ref double minX, ref double minY, ref double maxX, ref double maxY)

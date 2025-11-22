@@ -48,6 +48,10 @@ namespace Zarus.Map
             if (mapController == null)
             {
                 mapController = FindFirstObjectByType<RegionMapController>();
+                if (mapController == null)
+                {
+                    Debug.LogWarning("[RegionMapCameraController] No RegionMapController found in scene. Camera bounds clamping will be disabled.");
+                }
             }
         }
 
@@ -68,21 +72,8 @@ namespace Zarus.Map
             var worldPos = mapController.GetWorldPosition(entry.Centroid);
             targetPosition = new Vector3(worldPos.x, worldPos.y, transform.position.z);
             
-            // Calculate orthographic size based on bounds and camera aspect ratio
-            var boundsSize = entry.Bounds.size * mapController.MapScale;
-            var aspect = targetCamera.aspect;
-            
-            // Calculate orthographic size needed to fit the region
-            // orthoSize is half-height, so we need to fit the full height
-            var orthoSizeForHeight = boundsSize.y * 0.5f;
-            // For width, account for aspect ratio (orthoSize * aspect * 2 = view width)
-            var orthoSizeForWidth = boundsSize.x / (aspect * 2f);
-            
-            // Use the larger of the two to ensure the entire region fits
-            var requiredOrthoSize = Mathf.Max(orthoSizeForHeight, orthoSizeForWidth);
-            
-            // Add padding factor (1.2x) to give some visual breathing room
-            targetOrthoSize = Mathf.Clamp(requiredOrthoSize * 1.2f, minOrthoSize, maxOrthoSize);
+            // Use consistent zoom level for all provinces
+            targetOrthoSize = minOrthoSize;
         }
 
         public void FocusOnRegionById(string regionId)
