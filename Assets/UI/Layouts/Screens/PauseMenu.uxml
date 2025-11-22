@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" 
+       xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       engine="UnityEngine.UIElements" 
+       editor="UnityEditor.UIElements" 
+       noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" 
+       editor-extension-mode="False">
+    
+    <ui:Style src="../../Styles/MainTheme.uss" />
+    
+    <!-- Pause Menu Screen -->
+    <ui:VisualElement name="PauseMenuRoot" class="overlay-backdrop">
+        
+        <!-- Main Menu Panel -->
+        <ui:VisualElement name="MenuPanel" class="menu-panel slide-up">
+            
+            <!-- Title -->
+            <ui:Label text="PAUSED" name="MenuTitle" class="menu-title"/>
+            
+            <!-- Subtitle -->
+            <ui:Label text="Game is paused" name="MenuSubtitle" class="menu-subtitle"/>
+            
+            <!-- Button Group -->
+            <ui:VisualElement name="ButtonGroup" class="menu-button-group">
+                
+                <!-- Resume Button -->
+                <ui:Button text="Resume" name="ResumeButton" class="button button--primary menu-button"/>
+                
+                <!-- Settings Button (Future) -->
+                <ui:Button text="Settings" name="SettingsButton" class="button button--secondary menu-button"/>
+                
+                <!-- Quit to Menu Button -->
+                <ui:Button text="Quit to Menu" name="QuitButton" class="button button--danger menu-button"/>
+                
+            </ui:VisualElement>
+            
+            <!-- Help Text -->
+            <ui:Label text="Press ESC to resume" name="HelpText" class="menu-subtitle" style="margin-top: 24px; font-size: 14px;"/>
+            
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+    
+</ui:UXML>

@@ -1,0 +1,17 @@
+{
+    "name": "Zarus.UI",
+    "rootNamespace": "Zarus.UI",
+    "references": [
+        "Zarus.Map",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

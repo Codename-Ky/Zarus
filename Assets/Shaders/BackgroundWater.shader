@@ -31,7 +31,7 @@ Shader "Custom/BackgroundWater"
         Pass
         {
             Name "UnlitWater"
-            Tags { "LightMode" = "Universal2D" }
+            Tags { "LightMode" = "SRPDefaultUnlit" }
 
             HLSLPROGRAM
             #pragma vertex vert

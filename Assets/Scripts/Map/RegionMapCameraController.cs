@@ -156,11 +156,23 @@ namespace Zarus.Map
         {
             position = default;
             dragActive = false;
+            
+            // Try new Input System first
             var mouse = Mouse.current;
             if (mouse != null)
             {
                 position = mouse.position.ReadValue();
                 dragActive = mouse.rightButton.isPressed || mouse.middleButton.isPressed;
+                
+                // WebGL fallback: If Input System fails, use legacy Input
+                #if UNITY_WEBGL && !UNITY_EDITOR
+                if (position == Vector2.zero)
+                {
+                    position = Input.mousePosition;
+                    dragActive = Input.GetMouseButton(1) || Input.GetMouseButton(2);
+                }
+                #endif
+                
                 return true;
             }
 
@@ -175,6 +187,13 @@ namespace Zarus.Map
                     return true;
                 }
             }
+            
+            // WebGL ultimate fallback: Use legacy Input system
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            position = Input.mousePosition;
+            dragActive = Input.GetMouseButton(1) || Input.GetMouseButton(2);
+            return true;
+            #endif
 
             return false;
         }

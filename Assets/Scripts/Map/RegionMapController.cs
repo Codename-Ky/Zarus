@@ -32,12 +32,6 @@ namespace Zarus.Map
         [SerializeField]
         private float regionDepth = -0.1f;
 
-        [SerializeField]
-        private string sortingLayerName = "Default";
-
-        [SerializeField]
-        private int sortingOrder = 5;
-
         [Header("Interaction")]
         [SerializeField]
         private Camera interactionCamera;
@@ -87,6 +81,7 @@ namespace Zarus.Map
         private Bounds localBounds;
         private RegionRuntime currentHover;
         private RegionRuntime currentSelection;
+        private bool interactionEnabled = true;
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 #if UNITY_EDITOR
@@ -123,6 +118,11 @@ namespace Zarus.Map
 
         private void Update()
         {
+            if (!interactionEnabled)
+            {
+                return;
+            }
+
             HandlePointer();
         }
 
@@ -313,8 +313,6 @@ namespace Zarus.Map
 
                 var renderer = regionObject.AddComponent<MeshRenderer>();
                 renderer.sharedMaterial = material;
-                renderer.sortingLayerID = SortingLayer.NameToID(sortingLayerName);
-                renderer.sortingOrder = sortingOrder;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 renderer.receiveShadows = false;
 
@@ -379,6 +377,16 @@ namespace Zarus.Map
             {
                 position = mouse.position.ReadValue();
                 clicked = mouse.leftButton.wasPressedThisFrame;
+                
+                // WebGL fallback: If Input System fails, use legacy Input
+                #if UNITY_WEBGL && !UNITY_EDITOR
+                if (position == Vector2.zero)
+                {
+                    position = Input.mousePosition;
+                    clicked = Input.GetMouseButtonDown(0);
+                }
+                #endif
+                
                 return true;
             }
 
@@ -393,6 +401,13 @@ namespace Zarus.Map
                     return true;
                 }
             }
+            
+            // WebGL ultimate fallback: Use legacy Input system
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            position = Input.mousePosition;
+            clicked = Input.GetMouseButtonDown(0);
+            return true;
+            #endif
 
             return false;
         }
@@ -479,6 +494,21 @@ namespace Zarus.Map
             var containerGo = new GameObject("RegionContainer");
             containerGo.transform.SetParent(transform, false);
             regionContainer = containerGo.transform;
+        }
+
+        public void SetInteractionEnabled(bool enabled)
+        {
+            if (interactionEnabled == enabled)
+            {
+                return;
+            }
+
+            interactionEnabled = enabled;
+
+            if (!interactionEnabled)
+            {
+                ClearHover();
+            }
         }
 
         [Serializable]
