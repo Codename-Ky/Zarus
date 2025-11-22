@@ -89,6 +89,23 @@
     color: var(--text-primary);
 }
 
+/* Font Styles */
+.font-roboto {
+    -unity-font: url('/Assets/Fonts/Roboto-Regular.ttf');
+}
+
+.font-inter {
+    -unity-font: url('/Assets/Fonts/Inter-Regular.ttf');
+}
+
+.font-inter-bold {
+    -unity-font: url('/Assets/Fonts/Inter-Bold.ttf');
+}
+
+.font-inter-semibold {
+    -unity-font: url('/Assets/Fonts/Inter-SemiBold.ttf');
+}
+
 /* ========================================
    SCREEN CONTAINERS
    ======================================== */
@@ -220,12 +237,14 @@
     color: var(--text-muted);
     font-size: var(--font-size-small);
     margin-right: var(--spacing-sm);
+    -unity-font-definition: initial;
 }
 
 .hud-stat__value {
     color: var(--text-primary);
     font-size: var(--font-size-large);
     -unity-font-style: bold;
+    -unity-font-definition: initial;
 }
 
 /* ========================================

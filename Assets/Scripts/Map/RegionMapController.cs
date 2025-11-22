@@ -32,12 +32,6 @@ namespace Zarus.Map
         [SerializeField]
         private float regionDepth = -0.1f;
 
-        [SerializeField]
-        private string sortingLayerName = "Default";
-
-        [SerializeField]
-        private int sortingOrder = 5;
-
         [Header("Interaction")]
         [SerializeField]
         private Camera interactionCamera;
@@ -319,8 +313,6 @@ namespace Zarus.Map
 
                 var renderer = regionObject.AddComponent<MeshRenderer>();
                 renderer.sharedMaterial = material;
-                renderer.sortingLayerID = SortingLayer.NameToID(sortingLayerName);
-                renderer.sortingOrder = sortingOrder;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 renderer.receiveShadows = false;
 

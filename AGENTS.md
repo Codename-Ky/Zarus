@@ -5,7 +5,9 @@ Welcome to Zarus. This document orients automation agents and coders who touch t
 ## Unity baseline
 
 - **Engine**: Unity 6000.2.10f1 (match this editor version to avoid serialization churn).
-- **Render pipeline**: URP (see `Assets/Settings` and `UniversalRenderPipelineGlobalSettings.asset`).
+- **Render pipeline**: URP 3D (see `Assets/Settings` and `UniversalRenderPipelineGlobalSettings.asset`).
+  - Uses `ForwardRenderer.asset` for 3D rendering (orthographic camera, unlit materials).
+  - Converted from 2D URP to 3D URP for desktop deployment.
 - **Input**: Uses the Input System via `Assets/InputSystem_Actions.inputactions`.
 
 ## Repository structure
