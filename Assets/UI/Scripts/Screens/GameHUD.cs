@@ -23,9 +23,6 @@ namespace Zarus.UI
         // UI Elements
         private Label timerValue;
         private Label timerDetailLabel;
-        private Label timerIndicatorLabel;
-        private Label timerIndicatorIcon;
-        private VisualElement timerIndicatorContainer;
         private Label provinceNameLabel;
         private Label provinceDescLabel;
         private VisualElement provinceInfoContainer;
@@ -62,9 +59,6 @@ namespace Zarus.UI
             // Query UI elements directly from root
             timerValue = root.Q<Label>("TimerValue");
             timerDetailLabel = root.Q<Label>("TimerDetail");
-            timerIndicatorLabel = root.Q<Label>("TimerIndicatorLabel");
-            timerIndicatorIcon = root.Q<Label>("TimerIndicatorIcon");
-            timerIndicatorContainer = root.Q<VisualElement>("TimerIndicator");
             provinceInfoContainer = root.Q<VisualElement>("ProvinceInfo");
             provinceNameLabel = root.Q<Label>("ProvinceNameLabel");
             provinceDescLabel = root.Q<Label>("ProvinceDescLabel");
@@ -172,26 +166,11 @@ namespace Zarus.UI
                     timerDetailLabel.text = FormatDetailedDate(latestTimeSnapshot.DateTime);
                 }
 
-                var indicator = latestTimeSnapshot.GetIndicatorLabel();
-                if (timerIndicatorLabel != null)
-                {
-                    timerIndicatorLabel.text = indicator;
-                }
-
-                if (timerIndicatorIcon != null)
-                {
-                    timerIndicatorIcon.text = GetIndicatorIcon(latestTimeSnapshot.Segment);
-                }
-
-                UpdateIndicatorStyles(latestTimeSnapshot.Segment);
             }
             else
             {
                 timerValue.text = "--:-- (–) Day --";
                 if (timerDetailLabel != null) timerDetailLabel.text = "Syncing time";
-                if (timerIndicatorLabel != null) timerIndicatorLabel.text = "SYNC";
-                if (timerIndicatorIcon != null) timerIndicatorIcon.text = "…";
-                UpdateIndicatorStyles(null);
             }
         }
 
@@ -200,45 +179,6 @@ namespace Zarus.UI
             latestTimeSnapshot = snapshot;
             hasTimeSnapshot = true;
             UpdateTimer();
-        }
-
-        private void UpdateIndicatorStyles(InGameTimeSnapshot.DaySegment? segment)
-        {
-            if (timerIndicatorContainer == null)
-            {
-                return;
-            }
-
-            timerIndicatorContainer.RemoveFromClassList("hud-timer-indicator--dawn");
-            timerIndicatorContainer.RemoveFromClassList("hud-timer-indicator--day");
-            timerIndicatorContainer.RemoveFromClassList("hud-timer-indicator--dusk");
-            timerIndicatorContainer.RemoveFromClassList("hud-timer-indicator--night");
-
-            if (!segment.HasValue)
-            {
-                return;
-            }
-
-            var className = segment.Value switch
-            {
-                InGameTimeSnapshot.DaySegment.Dawn => "hud-timer-indicator--dawn",
-                InGameTimeSnapshot.DaySegment.Day => "hud-timer-indicator--day",
-                InGameTimeSnapshot.DaySegment.Dusk => "hud-timer-indicator--dusk",
-                _ => "hud-timer-indicator--night"
-            };
-
-            timerIndicatorContainer.AddToClassList(className);
-        }
-
-        private static string GetIndicatorIcon(InGameTimeSnapshot.DaySegment segment)
-        {
-            return segment switch
-            {
-                InGameTimeSnapshot.DaySegment.Dawn => "☼",
-                InGameTimeSnapshot.DaySegment.Day => "☀",
-                InGameTimeSnapshot.DaySegment.Dusk => "☽",
-                _ => "☾"
-            };
         }
 
         private string GetTimeScaleDisplay()
