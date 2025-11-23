@@ -262,15 +262,95 @@ namespace Zarus.Systems
                 globalVolume = volumeGO.AddComponent<Volume>();
             }
 
+            if (globalVolume.transform.parent != transform)
+            {
+                globalVolume.transform.SetParent(transform, false);
+            }
+
             globalVolume.isGlobal = true;
             globalVolume.priority = 0f;
             globalVolume.gameObject.layer = LayerMask.NameToLayer("Default");
             globalVolume.hideFlags = Application.isPlaying ? HideFlags.DontSave : HideFlags.DontSaveInEditor;
 
+            var resolvedProfile = ResolveVolumeProfile();
+            if (resolvedProfile != null)
+            {
+                if (defaultVolumeProfile != null)
+                {
+                    globalVolume.sharedProfile = defaultVolumeProfile;
+                }
+                else if (globalVolume.sharedProfile == null)
+                {
+                    if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset)
+                    {
+                        globalVolume.sharedProfile = resolvedProfile;
+                    }
+                    else
+                    {
+                        globalVolume.profile = resolvedProfile;
+                    }
+                }
+            }
+        }
+
+        private VolumeProfile ResolveVolumeProfile()
+        {
             if (defaultVolumeProfile != null)
             {
-                globalVolume.sharedProfile = defaultVolumeProfile;
+                return defaultVolumeProfile;
             }
+
+            if (globalVolume != null)
+            {
+                if (globalVolume.sharedProfile != null)
+                {
+                    return globalVolume.sharedProfile;
+                }
+
+                if (globalVolume.profile != null)
+                {
+                    return globalVolume.profile;
+                }
+            }
+
+            if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset && urpAsset.defaultVolumeProfile != null)
+            {
+                return urpAsset.defaultVolumeProfile;
+            }
+
+            var runtimeProfile = ScriptableObject.CreateInstance<VolumeProfile>();
+            runtimeProfile.name = "RuntimeVolumeProfile";
+
+            if (!runtimeProfile.TryGet<ColorAdjustments>(out var colorAdjustments))
+            {
+                colorAdjustments = runtimeProfile.Add<ColorAdjustments>();
+                colorAdjustments.postExposure.overrideState = true;
+                colorAdjustments.postExposure.value = 0f;
+                colorAdjustments.saturation.overrideState = true;
+                colorAdjustments.saturation.value = -5f;
+            }
+
+            if (!runtimeProfile.TryGet<Bloom>(out var bloom))
+            {
+                bloom = runtimeProfile.Add<Bloom>();
+                bloom.intensity.overrideState = true;
+                bloom.intensity.value = 0.25f;
+                bloom.scatter.overrideState = true;
+                bloom.scatter.value = 0.6f;
+                bloom.threshold.overrideState = true;
+                bloom.threshold.value = 1.2f;
+            }
+
+            if (!runtimeProfile.TryGet<Vignette>(out var vignette))
+            {
+                vignette = runtimeProfile.Add<Vignette>();
+                vignette.intensity.overrideState = true;
+                vignette.intensity.value = 0.15f;
+                vignette.smoothness.overrideState = true;
+                vignette.smoothness.value = 0.5f;
+            }
+
+            return runtimeProfile;
         }
 
         private void AdvanceTime(float minutes)
