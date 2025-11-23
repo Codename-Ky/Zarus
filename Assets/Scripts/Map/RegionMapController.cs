@@ -32,6 +32,11 @@ namespace Zarus.Map
         [SerializeField]
         private float regionDepth = -0.1f;
 
+        [Header("Animation")]
+        [SerializeField]
+        [Min(0f)]
+        private float colorTransitionDuration = 0.2f;
+
         [Header("Interaction")]
         [SerializeField]
         private Camera interactionCamera;
@@ -118,6 +123,8 @@ namespace Zarus.Map
 
         private void Update()
         {
+            UpdateRegionAnimations(Time.deltaTime);
+
             if (!interactionEnabled)
             {
                 return;
@@ -320,9 +327,22 @@ namespace Zarus.Map
                 collider.sharedMesh = entry.Mesh;
 
                 var runtime = new RegionRuntime(entry, renderer, collider);
-                runtime.UpdateColor(entry.VisualStyle.BaseColor);
+                runtime.UpdateColor(entry.VisualStyle.BaseColor, true, colorTransitionDuration);
                 activeRegions.Add(runtime);
                 colliderLookup[collider.GetInstanceID()] = runtime;
+            }
+        }
+
+        private void UpdateRegionAnimations(float deltaTime)
+        {
+            if (activeRegions.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var region in activeRegions)
+            {
+                region.TickColorAnimation(deltaTime);
             }
         }
 
@@ -421,13 +441,13 @@ namespace Zarus.Map
 
             if (currentHover != null && currentHover != currentSelection)
             {
-                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor);
+                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
             }
 
             currentHover = runtime;
             if (currentHover != null && currentHover != currentSelection)
             {
-                currentHover.UpdateColor(currentHover.Entry.VisualStyle.HoverColor);
+                currentHover.UpdateColor(currentHover.Entry.VisualStyle.HoverColor, false, colorTransitionDuration);
                 onRegionHovered?.Invoke(currentHover.Entry);
             }
         }
@@ -436,7 +456,7 @@ namespace Zarus.Map
         {
             if (currentHover != null && currentHover != currentSelection)
             {
-                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor);
+                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
             }
 
             currentHover = null;
@@ -453,11 +473,11 @@ namespace Zarus.Map
 
             if (currentSelection != null && currentSelection != runtime)
             {
-                currentSelection.UpdateColor(currentSelection.Entry.VisualStyle.BaseColor);
+                currentSelection.UpdateColor(currentSelection.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
             }
 
             currentSelection = runtime;
-            currentSelection?.UpdateColor(currentSelection.Entry.VisualStyle.SelectedColor);
+            currentSelection?.UpdateColor(currentSelection.Entry.VisualStyle.SelectedColor, false, colorTransitionDuration);
             onRegionSelected?.Invoke(runtime.Entry);
             autoFocusController?.FocusOnRegion(runtime.Entry);
         }
@@ -528,7 +548,51 @@ namespace Zarus.Map
                 Collider = collider;
             }
 
-            public void UpdateColor(Color color)
+            private Color currentColor;
+            private Color startColor;
+            private Color targetColor;
+            private float colorLerpTime;
+            private float colorLerpDuration;
+            private bool colorAnimating;
+
+            public void UpdateColor(Color color, bool instant, float transitionDuration)
+            {
+                if (instant || transitionDuration <= 0f)
+                {
+                    currentColor = color;
+                    targetColor = color;
+                    colorAnimating = false;
+                    ApplyColor(color);
+                    return;
+                }
+
+                startColor = currentColor;
+                targetColor = color;
+                colorLerpTime = 0f;
+                colorLerpDuration = transitionDuration;
+                colorAnimating = true;
+            }
+
+            public void TickColorAnimation(float deltaTime)
+            {
+                if (!colorAnimating)
+                {
+                    return;
+                }
+
+                colorLerpTime += deltaTime;
+                var t = Mathf.Clamp01(colorLerpTime / Mathf.Max(colorLerpDuration, Mathf.Epsilon));
+                var eased = Mathf.SmoothStep(0f, 1f, t);
+                currentColor = Color.Lerp(startColor, targetColor, eased);
+                ApplyColor(currentColor);
+
+                if (t >= 1f)
+                {
+                    colorAnimating = false;
+                }
+            }
+
+            private void ApplyColor(Color color)
             {
                 propertyBlock.SetColor(BaseColorId, color);
                 propertyBlock.SetColor(EmissionColorId, color * 0.1f);
