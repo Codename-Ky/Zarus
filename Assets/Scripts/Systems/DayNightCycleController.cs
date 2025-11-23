@@ -133,6 +133,12 @@ namespace Zarus.Systems
 
             sunLight ??= AutoCreateLight("Dynamic Sun", LightType.Directional, new Color(1f, 0.956f, 0.839f));
             moonLight ??= AutoCreateLight("Dynamic Moon", LightType.Directional, new Color(0.65f, 0.75f, 0.9f));
+            if (nightLightsEffect == null)
+            {
+                var lightsGo = new GameObject("NightLightsEffect");
+                lightsGo.transform.SetParent(transform, false);
+                nightLightsEffect = lightsGo.AddComponent<NightLightsEffect>();
+            }
         }
 
         private void Start()
