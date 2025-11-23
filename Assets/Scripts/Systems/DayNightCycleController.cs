@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using Zarus.Map;
 
 namespace Zarus.Systems
@@ -46,6 +47,15 @@ namespace Zarus.Systems
 
         [SerializeField]
         private Light moonLight;
+
+        [SerializeField]
+        private Camera volumeCamera;
+
+        [SerializeField]
+        private Volume globalVolume;
+
+        [SerializeField]
+        private VolumeProfile defaultVolumeProfile;
 
         [SerializeField]
         private float sunAzimuth = 35f;
@@ -212,6 +222,54 @@ namespace Zarus.Systems
                     lightsGo.transform.SetParent(transform, false);
                     nightLightsEffect = lightsGo.AddComponent<NightLightsEffect>();
                 }
+            }
+
+            if (volumeCamera == null)
+            {
+                volumeCamera = Camera.main;
+            }
+
+            if (volumeCamera != null)
+            {
+                var additionalData = volumeCamera.GetComponent<UniversalAdditionalCameraData>();
+                if (additionalData != null)
+                {
+                    if (additionalData.volumeTrigger == null)
+                    {
+                        additionalData.volumeTrigger = volumeCamera.transform;
+                    }
+
+                    if (additionalData.volumeLayerMask.value == 0)
+                    {
+                        additionalData.volumeLayerMask = LayerMask.GetMask("Default");
+                    }
+
+                    additionalData.renderPostProcessing = true;
+                    additionalData.requiresColorTexture = true;
+                    additionalData.requiresDepthTexture = true;
+                }
+            }
+
+            if (globalVolume == null)
+            {
+                globalVolume = FindFirstObjectByType<Volume>();
+            }
+
+            if (globalVolume == null)
+            {
+                var volumeGO = new GameObject("Global Volume");
+                volumeGO.transform.SetParent(transform, false);
+                globalVolume = volumeGO.AddComponent<Volume>();
+            }
+
+            globalVolume.isGlobal = true;
+            globalVolume.priority = 0f;
+            globalVolume.gameObject.layer = LayerMask.NameToLayer("Default");
+            globalVolume.hideFlags = Application.isPlaying ? HideFlags.DontSave : HideFlags.DontSaveInEditor;
+
+            if (defaultVolumeProfile != null)
+            {
+                globalVolume.sharedProfile = defaultVolumeProfile;
             }
         }
 
