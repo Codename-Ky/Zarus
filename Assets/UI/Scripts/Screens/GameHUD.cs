@@ -22,6 +22,7 @@ namespace Zarus.UI
 
         // UI Elements
         private Label timerValue;
+        private Label timerSubValueLabel;
         private Label timerDetailLabel;
         private Label provinceNameLabel;
         private Label provinceDescLabel;
@@ -58,13 +59,14 @@ namespace Zarus.UI
 
             // Query UI elements directly from root
             timerValue = root.Q<Label>("TimerValue");
+            timerSubValueLabel = root.Q<Label>("TimerSubValue");
             timerDetailLabel = root.Q<Label>("TimerDetail");
             provinceInfoContainer = root.Q<VisualElement>("ProvinceInfo");
             provinceNameLabel = root.Q<Label>("ProvinceNameLabel");
             provinceDescLabel = root.Q<Label>("ProvinceDescLabel");
 
             // Verify all elements were found
-            Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, TimerDetail: {timerDetailLabel != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
+            Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, TimerSubValue: {timerSubValueLabel != null}, TimerDetail: {timerDetailLabel != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
 
             if (timerValue == null) Debug.LogError("[GameHUD] TimerValue not found in UXML!");
             if (provinceNameLabel == null) Debug.LogError("[GameHUD] ProvinceNameLabel not found in UXML!");
@@ -76,6 +78,12 @@ namespace Zarus.UI
                 timerValue.style.display = DisplayStyle.Flex;
                 timerValue.style.visibility = Visibility.Visible;
                 timerValue.style.opacity = 1f;
+            }
+            if (timerSubValueLabel != null)
+            {
+                timerSubValueLabel.style.display = DisplayStyle.Flex;
+                timerSubValueLabel.style.visibility = Visibility.Visible;
+                timerSubValueLabel.style.opacity = 1f;
             }
             if (timerDetailLabel != null)
             {
@@ -159,7 +167,12 @@ namespace Zarus.UI
             if (hasTimeSnapshot)
             {
                 var timeText = latestTimeSnapshot.DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
-                timerValue.text = $"{timeText} ({GetTimeScaleDisplay()}) Day {latestTimeSnapshot.DayIndex}";
+                timerValue.text = $"Day {latestTimeSnapshot.DayIndex}";
+
+                if (timerSubValueLabel != null)
+                {
+                    timerSubValueLabel.text = $"{timeText} | {GetTimeScaleDisplay()} speed";
+                }
 
                 if (timerDetailLabel != null)
                 {
@@ -169,8 +182,9 @@ namespace Zarus.UI
             }
             else
             {
-                timerValue.text = "--:-- (–) Day --";
-                if (timerDetailLabel != null) timerDetailLabel.text = "Syncing time";
+                timerValue.text = "Day --";
+                if (timerSubValueLabel != null) timerSubValueLabel.text = "--:-- | – speed";
+                if (timerDetailLabel != null) timerDetailLabel.text = "Waiting for time";
             }
         }
 

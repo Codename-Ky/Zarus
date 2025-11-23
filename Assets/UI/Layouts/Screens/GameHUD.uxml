@@ -18,19 +18,9 @@
                 
                 <!-- Global Timer -->
                 <ui:VisualElement name="TimerStat" class="hud-stat hud-stat--vertical">
-                    <ui:Label text="--:--" name="TimerValue" class="hud-stat__value" style="color: #e9f1ff;"/>
-                    <ui:Label text="Day 1 — Jan 1" name="TimerDetail" class="hud-timer-detail" />
-                </ui:VisualElement>
-                
-            </ui:VisualElement>
-            
-            <!-- Right Controls Group -->
-            <ui:VisualElement name="RightControls" class="flex-row">
-                
-                <!-- Game Speed (Future) -->
-                <ui:VisualElement name="GameSpeedStat" class="hud-stat">
-                    <ui:Label text="SPEED" name="GameSpeedLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
-                    <ui:Label text="1x" name="GameSpeedValue" class="hud-stat__value" style="color: #e9f1ff;"/>
+                    <ui:Label text="Day --" name="TimerValue" class="hud-stat__value" style="color: #e9f1ff;"/>
+                    <ui:Label text="--:-- | 1x" name="TimerSubValue" class="hud-timer-detail" />
+                    <ui:Label text="Jan 1st 2000" name="TimerDetail" class="hud-timer-detail" />
                 </ui:VisualElement>
                 
             </ui:VisualElement>
