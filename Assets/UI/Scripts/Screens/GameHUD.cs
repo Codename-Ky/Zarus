@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Zarus.Map;
@@ -25,16 +26,20 @@ namespace Zarus.UI
         private Label timerIndicatorLabel;
         private Label timerIndicatorIcon;
         private VisualElement timerIndicatorContainer;
-        private Label provincesValue;
         private Label provinceNameLabel;
         private Label provinceDescLabel;
+        private VisualElement provinceInfoContainer;
 
         // Game State
         private HashSet<string> visitedProvinces = new HashSet<string>();
-        private int totalProvinces = 9; // South Africa has 9 provinces
         private RegionEntry selectedRegion;
         private InGameTimeSnapshot latestTimeSnapshot;
         private bool hasTimeSnapshot;
+        private bool provinceInfoVisible;
+        private float provinceInfoTimer;
+
+        private const float ProvinceInfoDisplayDuration = 4f;
+        private const float TimeScaleDisplayBaseline = 30f;
 
         protected override void Initialize()
         {
@@ -60,15 +65,14 @@ namespace Zarus.UI
             timerIndicatorLabel = root.Q<Label>("TimerIndicatorLabel");
             timerIndicatorIcon = root.Q<Label>("TimerIndicatorIcon");
             timerIndicatorContainer = root.Q<VisualElement>("TimerIndicator");
-            provincesValue = root.Q<Label>("ProvincesValue");
+            provinceInfoContainer = root.Q<VisualElement>("ProvinceInfo");
             provinceNameLabel = root.Q<Label>("ProvinceNameLabel");
             provinceDescLabel = root.Q<Label>("ProvinceDescLabel");
-            
+
             // Verify all elements were found
-            Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, TimerDetail: {timerDetailLabel != null}, ProvincesValue: {provincesValue != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
-            
+            Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, TimerDetail: {timerDetailLabel != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
+
             if (timerValue == null) Debug.LogError("[GameHUD] TimerValue not found in UXML!");
-            if (provincesValue == null) Debug.LogError("[GameHUD] ProvincesValue not found in UXML!");
             if (provinceNameLabel == null) Debug.LogError("[GameHUD] ProvinceNameLabel not found in UXML!");
             if (provinceDescLabel == null) Debug.LogError("[GameHUD] ProvinceDescLabel not found in UXML!");
 
@@ -84,12 +88,6 @@ namespace Zarus.UI
                 timerDetailLabel.style.display = DisplayStyle.Flex;
                 timerDetailLabel.style.visibility = Visibility.Visible;
                 timerDetailLabel.style.opacity = 1f;
-            }
-            if (provincesValue != null)
-            {
-                provincesValue.style.display = DisplayStyle.Flex;
-                provincesValue.style.visibility = Visibility.Visible;
-                provincesValue.style.opacity = 1f;
             }
             if (provinceNameLabel != null)
             {
@@ -115,7 +113,6 @@ namespace Zarus.UI
             {
                 mapController.OnRegionHovered.AddListener(OnProvinceHovered);
                 mapController.OnRegionSelected.AddListener(OnProvinceSelected);
-                totalProvinces = mapController.Entries.Count;
             }
 
             if (dayNightController == null)
@@ -144,9 +141,21 @@ namespace Zarus.UI
 
             // Initialize displays
             UpdateTimer();
-            UpdateProvincesCounter();
+            HideProvinceInfo(true);
             
-            Debug.Log($"[GameHUD] Initialization complete. Timer text: '{timerValue?.text}', Provinces text: '{provincesValue?.text}', Timer visible: {timerValue?.visible}, Timer display: {timerValue?.style.display}");
+            Debug.Log($"[GameHUD] Initialization complete. Timer text: '{timerValue?.text}', Timer visible: {timerValue?.visible}, Timer display: {timerValue?.style.display}");
+        }
+
+        private void Update()
+        {
+            if (provinceInfoVisible)
+            {
+                provinceInfoTimer -= Time.deltaTime;
+                if (provinceInfoTimer <= 0f)
+                {
+                    HideProvinceInfo();
+                }
+            }
         }
 
         private void UpdateTimer()
@@ -155,10 +164,12 @@ namespace Zarus.UI
 
             if (hasTimeSnapshot)
             {
-                timerValue.text = latestTimeSnapshot.DateTime.ToString("HH:mm");
+                var timeText = latestTimeSnapshot.DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
+                timerValue.text = $"{timeText} ({GetTimeScaleDisplay()}) Day {latestTimeSnapshot.DayIndex}";
+
                 if (timerDetailLabel != null)
                 {
-                    timerDetailLabel.text = $"Day {latestTimeSnapshot.DayIndex} — {latestTimeSnapshot.DateTime:MMM d}";
+                    timerDetailLabel.text = FormatDetailedDate(latestTimeSnapshot.DateTime);
                 }
 
                 var indicator = latestTimeSnapshot.GetIndicatorLabel();
@@ -176,7 +187,7 @@ namespace Zarus.UI
             }
             else
             {
-                timerValue.text = "--:--";
+                timerValue.text = "--:-- (–) Day --";
                 if (timerDetailLabel != null) timerDetailLabel.text = "Syncing time";
                 if (timerIndicatorLabel != null) timerIndicatorLabel.text = "SYNC";
                 if (timerIndicatorIcon != null) timerIndicatorIcon.text = "…";
@@ -223,18 +234,72 @@ namespace Zarus.UI
         {
             return segment switch
             {
-                InGameTimeSnapshot.DaySegment.Dawn => "☀",
-                InGameTimeSnapshot.DaySegment.Day => "☼",
-                InGameTimeSnapshot.DaySegment.Dusk => "☀",
+                InGameTimeSnapshot.DaySegment.Dawn => "☼",
+                InGameTimeSnapshot.DaySegment.Day => "☀",
+                InGameTimeSnapshot.DaySegment.Dusk => "☽",
                 _ => "☾"
             };
         }
 
-        private void UpdateProvincesCounter()
+        private string GetTimeScaleDisplay()
         {
-            if (provincesValue == null) return;
+            var scale = dayNightController != null ? dayNightController.TimeScale : TimeScaleDisplayBaseline;
+            if (Mathf.Approximately(TimeScaleDisplayBaseline, 0f))
+            {
+                return string.Format(CultureInfo.InvariantCulture, "{0:0.#}x", scale);
+            }
 
-            provincesValue.text = $"{visitedProvinces.Count} / {totalProvinces}";
+            var relative = scale / TimeScaleDisplayBaseline;
+            return string.Format(CultureInfo.InvariantCulture, "{0:0.#}x", relative);
+        }
+
+        private static string FormatDetailedDate(System.DateTime dateTime)
+        {
+            var month = dateTime.ToString("MMM", CultureInfo.InvariantCulture);
+            var day = dateTime.Day;
+            var suffix = GetDaySuffix(day);
+            return $"{month} {day}{suffix} {dateTime:yyyy}";
+        }
+
+        private static string GetDaySuffix(int day)
+        {
+            var rem100 = day % 100;
+            if (rem100 >= 11 && rem100 <= 13)
+            {
+                return "th";
+            }
+
+            return (day % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th"
+            };
+        }
+
+        private void ShowProvinceInfo()
+        {
+            if (provinceInfoContainer == null)
+            {
+                return;
+            }
+
+            provinceInfoVisible = true;
+            provinceInfoTimer = ProvinceInfoDisplayDuration;
+            provinceInfoContainer.AddToClassList("hud-province-info--visible");
+        }
+
+        private void HideProvinceInfo(bool immediate = false)
+        {
+            if (provinceInfoContainer == null)
+            {
+                return;
+            }
+
+            provinceInfoVisible = false;
+            provinceInfoTimer = 0f;
+            provinceInfoContainer.RemoveFromClassList("hud-province-info--visible");
         }
 
         private void OnProvinceHovered(RegionEntry region)
@@ -263,7 +328,6 @@ namespace Zarus.UI
             if (!visitedProvinces.Contains(region.RegionId))
             {
                 visitedProvinces.Add(region.RegionId);
-                UpdateProvincesCounter();
                 Debug.Log($"[GameHUD] Province visited: {region.DisplayName}");
             }
 
@@ -280,6 +344,8 @@ namespace Zarus.UI
                     : "Selected province";
                 provinceDescLabel.text = desc;
             }
+
+            ShowProvinceInfo();
         }
 
         /// <summary>
@@ -296,7 +362,6 @@ namespace Zarus.UI
         public void ResetVisitedProvinces()
         {
             visitedProvinces.Clear();
-            UpdateProvincesCounter();
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Zarus.Systems
 
         [Header("Time Settings")]
         [SerializeField, Min(0.1f)]
-        private float timeScale = 60f;
+        private float timeScale = 30f;
 
         [SerializeField]
         private Vector2Int startYearRange = new(1994, 2024);
@@ -123,6 +123,7 @@ namespace Zarus.Systems
         public InGameTimeSnapshot CurrentTime => currentSnapshot;
         public bool HasTime => initialized;
         public UnityEvent<InGameTimeSnapshot> OnTimeChanged => onTimeChanged;
+        public float TimeScale => timeScale;
 
         private void Awake()
         {

@@ -27,12 +27,6 @@
                     <ui:Label text="Day 1 — Jan 1" name="TimerDetail" class="hud-timer-detail" />
                 </ui:VisualElement>
                 
-                <!-- Provinces Explored -->
-                <ui:VisualElement name="ProvincesStat" class="hud-stat">
-                    <ui:Label text="PROVINCES" name="ProvincesLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
-                    <ui:Label text="0 / 9" name="ProvincesValue" class="hud-stat__value" style="color: #e9f1ff;"/>
-                </ui:VisualElement>
-                
             </ui:VisualElement>
             
             <!-- Right Controls Group -->
@@ -52,7 +46,7 @@
         <ui:VisualElement name="BottomBar" class="hud-bottom">
             
             <!-- Current Province Info -->
-                <ui:VisualElement name="ProvinceInfo" class="hud-stat panel" style="min-width: 300px;">
+                <ui:VisualElement name="ProvinceInfo" class="hud-stat panel hud-province-info" style="min-width: 320px;">
                 <ui:Label text="No province selected" name="ProvinceNameLabel" class="hud-stat__label" style="margin-bottom: 4px; color: #e9f1ff;"/>
                 <ui:Label text="Click a province to view details" name="ProvinceDescLabel" class="hud-stat__value" style="font-size: 14px; -unity-font-style: normal; color: #e9f1ff;"/>
             </ui:VisualElement>
