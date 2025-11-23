@@ -234,6 +234,12 @@
     align-items: center;
 }
 
+.hud-stat--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 200px;
+}
+
 
 .hud-stat__label {
     color: var(--text-muted);
@@ -247,6 +253,58 @@
     font-size: var(--font-size-large);
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Roboto-Regular 1 SDF.asset?fileID=11400000&guid=21a08988cc3416b58abd39431e45c023&type=2#Roboto-Regular 1 SDF");
+}
+
+.hud-timer-indicator {
+    margin-top: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+    padding: 2px var(--spacing-sm);
+    border-radius: 999px;
+    border-width: 1px;
+    border-color: rgba(255,255,255,0.18);
+    background-color: rgba(255,255,255,0.06);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.hud-timer-indicator--dawn {
+    border-color: rgba(255, 204, 128, 0.35);
+    background-color: rgba(255, 204, 128, 0.12);
+}
+
+.hud-timer-indicator--day {
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(79, 215, 255, 0.14);
+}
+
+.hud-timer-indicator--dusk {
+    border-color: rgba(255, 153, 102, 0.35);
+    background-color: rgba(255, 153, 102, 0.12);
+}
+
+.hud-timer-indicator--night {
+    border-color: rgba(120, 146, 255, 0.4);
+    background-color: rgba(78, 96, 176, 0.2);
+}
+
+.hud-timer-indicator__icon {
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 2px 4px;
+}
+
+.hud-timer-indicator__text {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+    letter-spacing: 0.1em;
+}
+
+.hud-timer-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    opacity: 0.9;
+    margin-top: -2px;
 }
 
 /* ========================================

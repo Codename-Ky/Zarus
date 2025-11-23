@@ -17,9 +17,14 @@
             <ui:VisualElement name="LeftStats" class="flex-row">
                 
                 <!-- Global Timer -->
-                <ui:VisualElement name="TimerStat" class="hud-stat">
+                <ui:VisualElement name="TimerStat" class="hud-stat hud-stat--vertical">
                     <ui:Label text="TIME" name="TimerLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
-                    <ui:Label text="00:00" name="TimerValue" class="hud-stat__value" style="color: #e9f1ff;"/>
+                    <ui:VisualElement name="TimerIndicator" class="hud-timer-indicator">
+                        <ui:Label text="☀" name="TimerIndicatorIcon" class="hud-timer-indicator__icon" />
+                        <ui:Label text="DAY" name="TimerIndicatorLabel" class="hud-timer-indicator__text" />
+                    </ui:VisualElement>
+                    <ui:Label text="--:--" name="TimerValue" class="hud-stat__value" style="color: #e9f1ff;"/>
+                    <ui:Label text="Day 1 — Jan 1" name="TimerDetail" class="hud-timer-detail" />
                 </ui:VisualElement>
                 
                 <!-- Provinces Explored -->

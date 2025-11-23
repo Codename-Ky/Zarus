@@ -38,10 +38,10 @@ namespace Zarus.Systems
         {
             return Segment switch
             {
-                DaySegment.Dawn => "[DAWN]",
-                DaySegment.Day => "[DAY]",
-                DaySegment.Dusk => "[DUSK]",
-                _ => "[NIGHT]"
+                DaySegment.Dawn => "DAWN",
+                DaySegment.Day => "DAY",
+                DaySegment.Dusk => "DUSK",
+                _ => "NIGHT"
             };
         }
     }
