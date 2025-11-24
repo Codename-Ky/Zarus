@@ -45,8 +45,8 @@ namespace Zarus.UI
         [SerializeField]
         private Vector2 cursorHotspot = new Vector2(8f, 4f);
 
-        [SerializeField, Range(0.05f, 1f)]
-        private float cursorScale = 0.2f;
+        [SerializeField, Range(0.01f, 1f)]
+        private float cursorScale = 0.033333335f;
 
         [Header("Input")]
         [SerializeField]
@@ -262,7 +262,7 @@ namespace Zarus.UI
             }
 
             var textureToUse = sourceTexture;
-            float scale = Mathf.Clamp(cursorScale, 0.1f, 1f);
+            float scale = Mathf.Clamp(cursorScale, 0.01f, 1f);
             if (!Mathf.Approximately(scale, 1f))
             {
                 textureToUse = ScaleCursorTexture(sourceTexture, scale);
