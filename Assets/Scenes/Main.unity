@@ -888,6 +888,9 @@ MonoBehaviour:
   cursorHotspot: {x: 6, y: 6}
   cursorScale: 0.026666667
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  startSceneName: Start
+  gameplaySceneName: Main
+  endSceneName: End
 --- !u!4 &455424853
 Transform:
   m_ObjectHideFlags: 0

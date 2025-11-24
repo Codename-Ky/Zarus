@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements"
+        xsi="http://www.w3.org/2001/XMLSchema-instance"
+        engine="UnityEngine.UIElements"
+        editor="UnityEditor.UIElements"
+        noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+        editor-extension-mode="False">
+
+    <ui:Style src="../../Styles/MainTheme.uss" />
+
+    <ui:VisualElement name="EndMenuRoot" class="overlay-backdrop">
+        <ui:VisualElement name="MenuPanel" class="menu-panel slide-up">
+            <ui:Label name="MenuTitle" class="menu-title" text="Mission Complete" />
+            <ui:Label name="MenuSubtitle" class="menu-subtitle" text="Review your path and jump back in." />
+
+            <ui:VisualElement name="ButtonGroup" class="menu-button-group">
+                <ui:Button name="RestartButton" class="button button--primary menu-button" text="Restart" />
+                <ui:Button name="MenuButton" class="button button--secondary menu-button" text="Main Menu" />
+                <ui:Button name="ExitButton" class="button button--danger menu-button" text="Exit" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+</ui:UXML>

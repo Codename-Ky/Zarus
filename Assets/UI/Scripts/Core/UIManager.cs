@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using Zarus.Map;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Zarus.UI
 {
@@ -51,6 +55,16 @@ namespace Zarus.UI
         [Header("Input")]
         [SerializeField]
         private InputActionAsset inputActions;
+
+        [Header("Scene Flow")]
+        [SerializeField]
+        private string startSceneName = "Start";
+
+        [SerializeField]
+        private string gameplaySceneName = "Main";
+
+        [SerializeField]
+        private string endSceneName = "End";
 
         private InputAction pauseAction;
         private InputActionMap playerActionMap;
@@ -222,6 +236,36 @@ namespace Zarus.UI
         }
 
         /// <summary>
+        /// Returns to the start menu scene.
+        /// </summary>
+        public void ReturnToMenu()
+        {
+            Debug.Log("[UIManager] Returning to start menu...");
+            Time.timeScale = 1f;
+            LoadScene(startSceneName);
+        }
+
+        /// <summary>
+        /// Restarts the gameplay scene.
+        /// </summary>
+        public void RestartGame()
+        {
+            Debug.Log("[UIManager] Restarting gameplay scene...");
+            Time.timeScale = 1f;
+            LoadScene(gameplaySceneName);
+        }
+
+        /// <summary>
+        /// Loads the end/game over scene.
+        /// </summary>
+        public void ShowEndScreen()
+        {
+            Debug.Log("[UIManager] Loading end scene...");
+            Time.timeScale = 1f;
+            LoadScene(endSceneName);
+        }
+
+        /// <summary>
         /// Shows the game HUD.
         /// </summary>
         public void ShowHUD()
@@ -309,6 +353,17 @@ namespace Zarus.UI
 
             scaled.name = $"{source.name}_Scaled_{Mathf.RoundToInt(scale * 100f)}";
             return scaled;
+        }
+
+        private void LoadScene(string sceneName)
+        {
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogWarning("[UIManager] Scene name not configured.");
+                return;
+            }
+
+            SceneManager.LoadScene(sceneName);
         }
 
         private void SetMapInteractionEnabled(bool enabled)

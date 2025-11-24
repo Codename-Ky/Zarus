@@ -101,7 +101,7 @@ namespace Zarus.UI
         private void OnQuitClicked()
         {
             Debug.Log("[PauseMenu] Quit to menu clicked.");
-            UIManager.Instance?.QuitGame();
+            UIManager.Instance?.ReturnToMenu();
         }
 
         private void OnDestroy()
