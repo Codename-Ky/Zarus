@@ -47,12 +47,9 @@ namespace Zarus.UI
         private RegionEntry selectedRegion;
         private InGameTimeSnapshot latestTimeSnapshot;
         private bool hasTimeSnapshot;
-        private bool provinceInfoVisible;
-        private float provinceInfoTimer;
         private GlobalCureState latestGlobalState;
         private bool simulationEventsHooked;
 
-        private const float ProvinceInfoDisplayDuration = 4f;
         private const float TimeScaleDisplayBaseline = 30f;
         private static readonly string[] OutpostStatusClasses =
         {
@@ -138,6 +135,7 @@ namespace Zarus.UI
             }
 
             ResetOutpostActionsUI();
+            ShowProvinceInfo();
 
             // Find map controller if not assigned
             if (mapController == null)
@@ -185,21 +183,8 @@ namespace Zarus.UI
 
             // Initialize displays
             UpdateTimer();
-            HideProvinceInfo(true);
             
             Debug.Log($"[GameHUD] Initialization complete. Timer text: '{timerValue?.text}', Timer visible: {timerValue?.visible}, Timer display: {timerValue?.style.display}");
-        }
-
-        private void Update()
-        {
-            if (provinceInfoVisible)
-            {
-                provinceInfoTimer -= Time.deltaTime;
-                if (provinceInfoTimer <= 0f)
-                {
-                    HideProvinceInfo();
-                }
-            }
         }
 
         private void UpdateTimer()
@@ -281,21 +266,10 @@ namespace Zarus.UI
                 return;
             }
 
-            provinceInfoVisible = true;
-            provinceInfoTimer = ProvinceInfoDisplayDuration;
-            provinceInfoContainer.AddToClassList("hud-province-info--visible");
-        }
-
-        private void HideProvinceInfo(bool immediate = false)
-        {
-            if (provinceInfoContainer == null)
+            if (!provinceInfoContainer.ClassListContains("hud-province-info--visible"))
             {
-                return;
+                provinceInfoContainer.AddToClassList("hud-province-info--visible");
             }
-
-            provinceInfoVisible = false;
-            provinceInfoTimer = 0f;
-            provinceInfoContainer.RemoveFromClassList("hud-province-info--visible");
         }
 
         private void OnProvinceHovered(RegionEntry region)
@@ -465,6 +439,11 @@ namespace Zarus.UI
 
             if (state == null)
             {
+                if (selectedRegion == null)
+                {
+                    SetNoProvinceSelectedText();
+                }
+
                 var defaultText = string.IsNullOrEmpty(SelectedRegionId) ? "Select a province" : "No outbreak data";
                 SetOutpostStatusText(defaultText, "hud-outpost-status--none");
                 UpdateBuildControls();
@@ -538,6 +517,7 @@ namespace Zarus.UI
 
         private void ResetOutpostActionsUI()
         {
+            SetNoProvinceSelectedText();
             SetOutpostStatusText("Select a province", "hud-outpost-status--none");
             if (provinceInfectionLabel != null)
             {
@@ -550,6 +530,19 @@ namespace Zarus.UI
             }
 
             buildOutpostButton?.SetEnabled(false);
+        }
+
+        private void SetNoProvinceSelectedText()
+        {
+            if (provinceNameLabel != null)
+            {
+                provinceNameLabel.text = "NO PROVINCE SELECTED";
+            }
+
+            if (provinceDescLabel != null)
+            {
+                provinceDescLabel.text = "Select a province to view details";
+            }
         }
 
         private void SetOutpostStatusText(string text, string statusClass)

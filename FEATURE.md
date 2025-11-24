@@ -45,7 +45,7 @@ Time progression uses `DayNightCycleController.TimeUpdated` as the single source
 
 Below is an ordered list of commits. Each commit is intentionally small and focused so multiple agents can work safely in parallel while preserving a clean history.
 
-### 1) `feat: add outbreak core data model`
+### 1) `feat: add outbreak core data model` — ✅ Complete
 
 **Goal:** Introduce plain C# types for infection, outposts, and economy state without touching scenes or UI.
 
@@ -88,7 +88,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 2) `feat: implement province infection and outpost simulation`
+### 2) `feat: implement province infection and outpost simulation` — ✅ Complete
 
 **Goal:** Add a simulation controller that uses the data model and ticks infection/cure based on in‑game time, but still no UI or input integration.
 
@@ -162,7 +162,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 3) `feat: add outpost building API and ZAR cost scaling`
+### 3) `feat: add outpost building API and ZAR cost scaling` — ✅ Complete
 
 **Goal:** Add methods to build outposts with rules (no building in fully infected provinces, cost scaling, shared ZAR budget) and keep it UI‑agnostic but ready for HUD integration.
 
@@ -195,7 +195,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 4) `feat: extend HUD layout for cure meter, ZAR and outpost controls`
+### 4) `feat: extend HUD layout for cure meter, ZAR and outpost controls` — ✅ Complete
 
 **Goal:** Update the gameplay HUD layout to surface global cure progress, ZAR budget, and province‑specific outpost info, without wiring logic yet.
 
@@ -234,7 +234,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 5) `feat: bind HUD to outbreak simulation`
+### 5) `feat: bind HUD to outbreak simulation` — ✅ Complete
 
 **Goal:** Wire `GameHUD` to the simulation so the HUD reflects infection / cure state and exposes a clean API for interaction logic, including ZAR costs.
 
@@ -294,7 +294,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 6) `feat: add win and loss flow with distinct end screen`
+### 6) `feat: add win and loss flow with distinct end screen` — ✅ Complete
 
 **Goal:** Trigger scene transitions when the player wins or loses and display a distinct Victory/Defeat view with key stats.
 
@@ -356,7 +356,7 @@ Below is an ordered list of commits. Each commit is intentionally small and focu
 
 ---
 
-### 7) `feat: expose tuning knobs for challenge level`
+### 7) `feat: expose tuning knobs for challenge level` — ✅ Complete
 
 **Goal:** Make infection / cure rates, diminishing returns, and hub bonuses tunable in the editor and document defaults aligned with the desired game length and difficulty.
 
@@ -387,7 +387,8 @@ Current defaults in `OutbreakSimulationController` land at: `BaseInfectionPerHou
 
 ---
 
-### 8) `feat: add light telemetry and optional tests`
+### 8) `feat: add light telemetry and optional tests` — ✅ Complete
+  - Diagnostics flag implemented; lightweight unit tests still optional if future regressions appear.
 
 **Goal:** Provide basic diagnostics to help tune the system and, optionally, add a couple of unit tests for the pure data model.
 
