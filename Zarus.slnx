@@ -1,5 +1,7 @@
 ﻿<Solution>
   <Project Path="LibTessDotNet.csproj" />
+  <Project Path="Zarus.Systems.csproj" />
   <Project Path="Zarus.Map.csproj" />
   <Project Path="Zarus.UI.csproj" />
+  <Project Path="Zarus.Systems.Editor.csproj" />
 </Solution>
