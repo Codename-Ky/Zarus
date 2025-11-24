@@ -1,10 +1,10 @@
 {
-    "name": "Zarus.UI",
-    "rootNamespace": "Zarus.UI",
+    "name": "Zarus.Systems",
+    "rootNamespace": "Zarus.Systems",
     "references": [
         "Zarus.Map",
-        "Unity.InputSystem",
-        "Zarus.Systems"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

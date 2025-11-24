@@ -531,6 +531,15 @@ namespace Zarus.Map
             }
         }
 
+        public void SetGlobalEmissionMultiplier(float multiplier)
+        {
+            var clamped = Mathf.Max(0f, multiplier);
+            foreach (var region in activeRegions)
+            {
+                region.SetEmissionScale(clamped);
+            }
+        }
+
         [Serializable]
         public class RegionEntryEvent : UnityEvent<RegionEntry> { }
 
@@ -540,6 +549,7 @@ namespace Zarus.Map
             public MeshRenderer Renderer { get; }
             public MeshCollider Collider { get; }
             private readonly MaterialPropertyBlock propertyBlock = new();
+            private float emissionScale = 0.1f;
 
             public RegionRuntime(RegionEntry entry, MeshRenderer renderer, MeshCollider collider)
             {
@@ -595,8 +605,14 @@ namespace Zarus.Map
             private void ApplyColor(Color color)
             {
                 propertyBlock.SetColor(BaseColorId, color);
-                propertyBlock.SetColor(EmissionColorId, color * 0.1f);
+                propertyBlock.SetColor(EmissionColorId, color * emissionScale);
                 Renderer.SetPropertyBlock(propertyBlock);
+            }
+
+            public void SetEmissionScale(float scale)
+            {
+                emissionScale = Mathf.Max(0f, scale);
+                ApplyColor(currentColor);
             }
         }
     }

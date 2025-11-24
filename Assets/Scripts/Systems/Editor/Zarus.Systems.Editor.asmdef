@@ -1,12 +1,11 @@
 {
-    "name": "Zarus.UI",
-    "rootNamespace": "Zarus.UI",
+    "name": "Zarus.Systems.Editor",
     "references": [
-        "Zarus.Map",
-        "Unity.InputSystem",
         "Zarus.Systems"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
