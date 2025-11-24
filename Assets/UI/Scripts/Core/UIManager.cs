@@ -400,10 +400,16 @@ namespace Zarus.UI
 
         private void EnsureGameHUDReference()
         {
-            if (gameHUD == null)
+            if (gameHUD != null)
             {
-                gameHUD = FindFirstObjectByType<GameHUD>();
+                return;
             }
+
+#if UNITY_2023_1_OR_NEWER
+            gameHUD = UnityEngine.Object.FindFirstObjectByType<GameHUD>();
+#else
+            gameHUD = UnityEngine.Object.FindObjectOfType<GameHUD>();
+#endif
         }
     }
 }
