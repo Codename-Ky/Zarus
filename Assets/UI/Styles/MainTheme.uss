@@ -229,7 +229,6 @@
     width: 360px;
     max-width: 420px;
     align-items: stretch;
-    gap: var(--spacing-md);
 }
 
 .hud-card {
@@ -240,11 +239,14 @@
     padding: var(--spacing-md);
     flex-direction: column;
     align-items: stretch;
-    box-shadow: var(--shadow-small);
+    margin-bottom: var(--spacing-md);
+}
+
+.hud-card--flush {
+    margin-bottom: 0;
 }
 
 .hud-card--stack {
-    gap: var(--spacing-md);
 }
 
 .hud-card__section {
@@ -253,7 +255,15 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.hud-card__section:last-child {
+.hud-card__section--flush {
+    margin-bottom: 0;
+}
+
+.hud-stack-item--sm {
+    margin-bottom: var(--spacing-sm);
+}
+
+.hud-stack-item--flush {
     margin-bottom: 0;
 }
 
@@ -326,7 +336,6 @@
     padding: 0;
     flex-direction: column;
     min-width: 100%;
-    gap: var(--spacing-sm);
 }
 
 .hud-outpost-status--none {

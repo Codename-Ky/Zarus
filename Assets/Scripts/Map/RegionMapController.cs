@@ -32,6 +32,16 @@ namespace Zarus.Map
         [SerializeField]
         private float regionDepth = -0.1f;
 
+        [Header("Infection Visualization")]
+        [SerializeField]
+        private bool tintRegionsByInfection = true;
+
+        [SerializeField]
+        private Color maxInfectionColor = new Color(0.82f, 0.16f, 0.21f, 1f);
+
+        [SerializeField, Range(0.1f, 3f)]
+        private float infectionColorExponent = 1f;
+
         [Header("Animation")]
         [SerializeField]
         [Min(0f)]
@@ -82,6 +92,8 @@ namespace Zarus.Map
         private readonly List<RegionEntry> runtimeEntries = new();
         private readonly List<RegionRuntime> activeRegions = new();
         private readonly Dictionary<int, RegionRuntime> colliderLookup = new();
+        private readonly Dictionary<string, RegionRuntime> regionIdLookup = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, float> infectionLevels = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<Mesh> runtimeGeneratedMeshes = new();
         private Bounds localBounds;
         private RegionRuntime currentHover;
@@ -285,6 +297,7 @@ namespace Zarus.Map
 
             activeRegions.Clear();
             colliderLookup.Clear();
+            regionIdLookup.Clear();
             regionContainer.localScale = new Vector3(mapScale, mapScale, 1f);
 
             if (runtimeEntries.Count == 0)
@@ -327,9 +340,14 @@ namespace Zarus.Map
                 collider.sharedMesh = entry.Mesh;
 
                 var runtime = new RegionRuntime(entry, renderer, collider);
-                runtime.UpdateColor(entry.VisualStyle.BaseColor, true, colorTransitionDuration);
+                var targetColor = GetBaseColorForEntry(entry);
+                runtime.UpdateColor(targetColor, true, colorTransitionDuration);
                 activeRegions.Add(runtime);
                 colliderLookup[collider.GetInstanceID()] = runtime;
+                if (!string.IsNullOrEmpty(entry.RegionId))
+                {
+                    regionIdLookup[entry.RegionId] = runtime;
+                }
             }
         }
 
@@ -446,7 +464,7 @@ namespace Zarus.Map
 
             if (currentHover != null && currentHover != currentSelection)
             {
-                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
+                currentHover.UpdateColor(GetBaseColorForEntry(currentHover.Entry), false, colorTransitionDuration);
             }
 
             currentHover = runtime;
@@ -461,7 +479,7 @@ namespace Zarus.Map
         {
             if (currentHover != null && currentHover != currentSelection)
             {
-                currentHover.UpdateColor(currentHover.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
+                currentHover.UpdateColor(GetBaseColorForEntry(currentHover.Entry), false, colorTransitionDuration);
             }
 
             currentHover = null;
@@ -478,7 +496,7 @@ namespace Zarus.Map
 
             if (currentSelection != null && currentSelection != runtime)
             {
-                currentSelection.UpdateColor(currentSelection.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
+                currentSelection.UpdateColor(GetBaseColorForEntry(currentSelection.Entry), false, colorTransitionDuration);
             }
 
             currentSelection = runtime;
@@ -491,7 +509,7 @@ namespace Zarus.Map
         {
             if (currentSelection != null && highlightSelection)
             {
-                currentSelection.UpdateColor(currentSelection.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
+                currentSelection.UpdateColor(GetBaseColorForEntry(currentSelection.Entry), false, colorTransitionDuration);
             }
 
             currentSelection = null;
@@ -552,8 +570,67 @@ namespace Zarus.Map
             var clamped = Mathf.Max(0f, multiplier);
             foreach (var region in activeRegions)
             {
-                region.SetEmissionScale(clamped);
+            region.SetEmissionScale(clamped);
             }
+        }
+
+        public void SetProvinceInfectionLevel(string regionId, float infection01)
+        {
+            if (string.IsNullOrEmpty(regionId))
+            {
+                return;
+            }
+
+            infectionLevels[regionId] = Mathf.Clamp01(infection01);
+
+            if (!tintRegionsByInfection || !regionIdLookup.TryGetValue(regionId, out var runtime))
+            {
+                return;
+            }
+
+            if (runtime == currentHover || runtime == currentSelection)
+            {
+                return;
+            }
+
+            runtime.UpdateColor(GetBaseColorForEntry(runtime.Entry), false, colorTransitionDuration);
+        }
+
+        private float GetInfectionLevel(string regionId)
+        {
+            if (string.IsNullOrEmpty(regionId))
+            {
+                return 0f;
+            }
+
+            return infectionLevels.TryGetValue(regionId, out var value) ? value : 0f;
+        }
+
+        private Color GetBaseColorForEntry(RegionEntry entry)
+        {
+            if (entry == null)
+            {
+                return Color.white;
+            }
+
+            var baseColor = entry.VisualStyle != null ? entry.VisualStyle.BaseColor : Color.white;
+            if (!tintRegionsByInfection)
+            {
+                return baseColor;
+            }
+
+            var infection = GetInfectionLevel(entry.RegionId);
+            if (infection <= 0f)
+            {
+                return baseColor;
+            }
+
+            if (!Mathf.Approximately(infectionColorExponent, 1f))
+            {
+                infection = Mathf.Pow(infection, infectionColorExponent);
+            }
+
+            return Color.Lerp(baseColor, maxInfectionColor, infection);
         }
 
         [Serializable]

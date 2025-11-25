@@ -41,6 +41,7 @@ namespace Zarus.UI
         private Label provinceInfectionLabel;
         private Button buildOutpostButton;
         private Label buildOutpostCostLabel;
+        private VisualElement hudInteractionBlockRegion;
 
         // Game State
         private HashSet<string> visitedProvinces = new HashSet<string>();
@@ -49,6 +50,8 @@ namespace Zarus.UI
         private bool hasTimeSnapshot;
         private GlobalCureState latestGlobalState;
         private bool simulationEventsHooked;
+        private bool pointerOverHudInteractionZone;
+        private bool mapInteractionSuppressedByHud;
 
         private const float TimeScaleDisplayBaseline = 30f;
         private static readonly string[] OutpostStatusClasses =
@@ -94,6 +97,8 @@ namespace Zarus.UI
             provinceInfectionLabel = root.Q<Label>("ProvinceInfectionLabel");
             buildOutpostButton = root.Q<Button>("BuildOutpostButton");
             buildOutpostCostLabel = root.Q<Label>("BuildOutpostCostLabel");
+            hudInteractionBlockRegion = root.Q<VisualElement>("LeftStats");
+            RegisterHudPointerGuards(root);
 
             // Verify all elements were found
             Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, TimerSubValue: {timerSubValueLabel != null}, TimerDetail: {timerDetailLabel != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
@@ -148,6 +153,7 @@ namespace Zarus.UI
             {
                 mapController.OnRegionHovered.AddListener(OnProvinceHovered);
                 mapController.OnRegionSelected.AddListener(OnProvinceSelected);
+                UpdateMapInteractionSuppression(pointerOverHudInteractionZone);
             }
 
             if (dayNightController == null)
@@ -480,6 +486,57 @@ namespace Zarus.UI
             UpdateBuildControls(state);
         }
 
+        private void RegisterHudPointerGuards(VisualElement root)
+        {
+            if (root == null || hudInteractionBlockRegion == null)
+            {
+                return;
+            }
+
+            root.RegisterCallback<PointerMoveEvent>(HandleHudPointerMove);
+            root.RegisterCallback<PointerLeaveEvent>(HandleHudPointerLeave);
+        }
+
+        private void HandleHudPointerMove(PointerMoveEvent evt)
+        {
+            if (hudInteractionBlockRegion == null)
+            {
+                return;
+            }
+
+            var pointerPosition = new Vector2(evt.position.x, evt.position.y);
+            var isInsideHud = hudInteractionBlockRegion.worldBound.Contains(pointerPosition);
+            if (isInsideHud == pointerOverHudInteractionZone)
+            {
+                return;
+            }
+
+            pointerOverHudInteractionZone = isInsideHud;
+            UpdateMapInteractionSuppression(pointerOverHudInteractionZone);
+        }
+
+        private void HandleHudPointerLeave(PointerLeaveEvent evt)
+        {
+            if (!pointerOverHudInteractionZone)
+            {
+                return;
+            }
+
+            pointerOverHudInteractionZone = false;
+            UpdateMapInteractionSuppression(false);
+        }
+
+        private void UpdateMapInteractionSuppression(bool shouldSuppress)
+        {
+            if (mapController == null || mapInteractionSuppressedByHud == shouldSuppress)
+            {
+                return;
+            }
+
+            mapInteractionSuppressedByHud = shouldSuppress;
+            mapController.SetInteractionEnabled(!mapInteractionSuppressedByHud);
+        }
+
         private void UpdateBuildControls(ProvinceInfectionState provinceState = null)
         {
             if (buildOutpostButton == null)
@@ -587,11 +644,39 @@ namespace Zarus.UI
                 return;
             }
 
-            if (outbreakSimulation.TryBuildOutpost(selectedRegion.RegionId, out var costR, out var error))
+            var regionId = selectedRegion.RegionId;
+            var canBuild = outbreakSimulation.CanBuildOutpost(regionId, out var costR, out var error);
+
+            if (buildOutpostCostLabel != null)
             {
+                buildOutpostCostLabel.text = string.Format(CultureInfo.InvariantCulture, "Cost: R {0}", costR);
+            }
+
+            if (!canBuild)
+            {
+                DisplayOutpostBuildError(error, costR);
+                UpdateBuildControls();
                 return;
             }
 
+            if (outbreakSimulation.TryBuildOutpost(regionId, out _, out var buildError))
+            {
+                RefreshSelectedProvinceState();
+                if (outbreakSimulation.GlobalState != null)
+                {
+                    HandleGlobalStateChanged(outbreakSimulation.GlobalState);
+                }
+
+                UpdateBuildControls();
+                return;
+            }
+
+            DisplayOutpostBuildError(buildError, costR);
+            UpdateBuildControls();
+        }
+
+        private void DisplayOutpostBuildError(OutbreakSimulationController.OutpostBuildError error, int costR)
+        {
             switch (error)
             {
                 case OutbreakSimulationController.OutpostBuildError.NotEnoughZar:
@@ -605,8 +690,6 @@ namespace Zarus.UI
                     SetOutpostStatusText("Unknown province – cannot deploy", "hud-outpost-status--disabled");
                     break;
             }
-
-            UpdateBuildControls();
         }
 
         /// <summary>
@@ -670,6 +753,18 @@ namespace Zarus.UI
             if (buildOutpostButton != null)
             {
                 buildOutpostButton.clicked -= OnBuildOutpostClicked;
+            }
+
+            if (rootElement != null)
+            {
+                rootElement.UnregisterCallback<PointerMoveEvent>(HandleHudPointerMove);
+                rootElement.UnregisterCallback<PointerLeaveEvent>(HandleHudPointerLeave);
+            }
+
+            if (mapInteractionSuppressedByHud && mapController != null)
+            {
+                mapController.SetInteractionEnabled(true);
+                mapInteractionSuppressedByHud = false;
             }
         }
     }

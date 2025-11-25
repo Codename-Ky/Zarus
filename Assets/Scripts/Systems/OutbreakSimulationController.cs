@@ -560,6 +560,11 @@ namespace Zarus.Systems
                 return;
             }
 
+            if (mapController != null)
+            {
+                mapController.SetProvinceInfectionLevel(state.RegionId, state.Infection01);
+            }
+
             onProvinceStateChanged?.Invoke(state);
             ProvinceStateChanged?.Invoke(state);
         }

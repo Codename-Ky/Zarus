@@ -38,7 +38,7 @@
                     <ui:VisualElement class="hud-divider" />
 
                     <!-- Outpost Summary -->
-                    <ui:VisualElement name="OutpostSummaryStat" class="hud-card__section hud-stat--vertical hud-outpost-summary">
+                    <ui:VisualElement name="OutpostSummaryStat" class="hud-card__section hud-card__section--flush hud-stat--vertical hud-outpost-summary">
                         <ui:Label text="Outposts: 0 active / 0 total" name="OutpostCountLabel" class="hud-stat__value" />
                         <ui:Label text="Budget: R 0" name="ZarBalanceLabel" class="hud-timer-detail" />
                     </ui:VisualElement>
@@ -46,7 +46,7 @@
                 </ui:VisualElement>
 
                 <!-- Province Details / Actions Card -->
-                <ui:VisualElement name="ProvinceCard" class="hud-card hud-card--stack">
+                <ui:VisualElement name="ProvinceCard" class="hud-card hud-card--stack hud-card--flush">
 
                     <!-- Current Province Info -->
                     <ui:VisualElement name="ProvinceInfo" class="hud-card__section hud-province-info" style="min-width: 320px;">
@@ -57,11 +57,11 @@
                     <ui:VisualElement class="hud-divider" />
 
                     <!-- Province Outpost Actions -->
-                    <ui:VisualElement name="OutpostActions" class="hud-card__section hud-province-actions">
-                        <ui:Label text="Select a province" name="OutpostStatusLabel" class="hud-stat__label hud-outpost-status--none" />
-                        <ui:Label text="Infection: --%" name="ProvinceInfectionLabel" class="hud-timer-detail" />
-                        <ui:Button name="BuildOutpostButton" text="Deploy Cure Outpost" class="hud-button" />
-                        <ui:Label text="Cost: R --" name="BuildOutpostCostLabel" class="hud-timer-detail" />
+                    <ui:VisualElement name="OutpostActions" class="hud-card__section hud-card__section--flush hud-province-actions">
+                        <ui:Label text="Select a province" name="OutpostStatusLabel" class="hud-stat__label hud-outpost-status--none hud-stack-item--sm" />
+                        <ui:Label text="Infection: --%" name="ProvinceInfectionLabel" class="hud-timer-detail hud-stack-item--sm" />
+                        <ui:Button name="BuildOutpostButton" text="Deploy Cure Outpost" class="hud-button hud-stack-item--sm" />
+                        <ui:Label text="Cost: R --" name="BuildOutpostCostLabel" class="hud-timer-detail hud-stack-item--sm hud-stack-item--flush" />
                     </ui:VisualElement>
                     
                 </ui:VisualElement>
